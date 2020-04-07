@@ -28,7 +28,7 @@ public class FormSubmit {
 
 
         //查询当前任务
-        Task task = taskService.createTaskQuery().processInstanceId("87505").singleResult();
+        Task task = taskService.createTaskQuery().processInstanceId("7505").singleResult();
         System.out.println("查询当前任务ID: " + task.getId() + ", 节点名称: " + task.getName());
 
         Scanner scanner = new Scanner(System.in);
@@ -61,12 +61,12 @@ public class FormSubmit {
 
         }
         // 获取当前用户信息
-        taskService.setAssignee(task.getId(),"CEO");
+        taskService.setAssignee(task.getId(),"boss");
         // 结束该节点
         taskService.complete(task.getId(),map);
 
         //获取下一个任务信息
-        Task nextTask = taskService.createTaskQuery().processInstanceId("87505").singleResult();
+        Task nextTask = taskService.createTaskQuery().processInstanceId("7505").singleResult();
         System.out.println(nextTask);
 
 

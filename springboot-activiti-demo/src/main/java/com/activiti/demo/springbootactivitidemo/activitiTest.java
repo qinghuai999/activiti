@@ -1,15 +1,18 @@
 package com.activiti.demo.springbootactivitidemo;
 
+import com.sun.xml.bind.v2.TODO;
 import org.activiti.engine.*;
 import org.activiti.engine.history.HistoricActivityInstance;
 import org.activiti.engine.history.HistoricIdentityLink;
 import org.activiti.engine.history.HistoricTaskInstance;
 import org.activiti.engine.history.HistoricVariableInstance;
+import org.activiti.engine.identity.Group;
 import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.Execution;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.IdentityLink;
+import org.activiti.engine.task.IdentityLinkType;
 import org.activiti.engine.task.Task;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -62,7 +65,7 @@ public class activitiTest {
     @Test
     public void startWorkFlow(){
         // 部署流程
-        Deployment deploy = repositoryService.createDeployment().addClasspathResource("processes/activitiDemo2.bpmn").deploy();
+        Deployment deploy = repositoryService.createDeployment().addClasspathResource("processes/activitiPowerTest.bpmn").deploy();
         System.out.println("部署流程ID: " + deploy.getId());
         // 查询流程定义
         ProcessDefinition definition = repositoryService.createProcessDefinitionQuery().deploymentId(deploy.getId()).singleResult();
@@ -161,23 +164,8 @@ public class activitiTest {
     }
 
     /**
-     * 查询该用户下的所有任务
+     * 流程部署 + 流程开启
      */
-    @Test
-    public void TaskByUser(){
-        // 该用户下有多少可审批任务
-        List<Task> manager = taskService.createTaskQuery().taskCandidateGroup("manager").list();
-        for (Task task : manager){
-            System.out.println(task.getId() + "," + task.getName());
-        }
-
-        // 通过任务id查询可参与者(参与组)
-        List<IdentityLink> identityLinksForTask = taskService.getIdentityLinksForTask("80019");
-        for (IdentityLink identityLink : identityLinksForTask){
-            System.out.println(identityLink.getUserId() + ", " + identityLink.getGroupId());
-        }
-    }
-
     @Test
     public void deployWorkFlow(){
         // 部署工作流
@@ -211,6 +199,36 @@ public class activitiTest {
         }
     }
 
+    // TODO ---------------------权限分割线--------------------------
+    /**
+     * 查询该用户下的所有任务
+     */
+    @Test
+    public void taskByUserQuery(){
+        // 该用户下有多少可审批任务
+        List<Task> manager = taskService.createTaskQuery().taskCandidateGroup("Q").list();
+        for (Task task : manager){
+            System.out.println(task.getId() + "," + task.getName());
+        }
+
+        // 通过任务id查询可参与者(参与组)
+        List<IdentityLink> identityLinksForTask = taskService.getIdentityLinksForTask("7509");
+        for (IdentityLink identityLink : identityLinksForTask){
+            System.out.println(identityLink.getUserId() + ", " + identityLink.getGroupId());
+        }
+    }
+
+    /**
+     * 使用流程变量给流程分配审批人/组
+     */
+    @Test
+    public void addTaskByUser(){
+//        Group group = identityService.newGroup("Q");
+//        identityService.saveGroup(group);
+        taskService.addUserIdentityLink("20006","boss",IdentityLinkType.CANDIDATE);
+    }
+
+    // TODO --------------------------历史查询---------------------------
     /**
      * 查询历史任务
      */
@@ -239,13 +257,13 @@ public class activitiTest {
     @Test
     public void historyUser(){
         // 通过实例查询审批人
-        List<HistoricIdentityLink> identityLinks = historyService.getHistoricIdentityLinksForProcessInstance("80005");
+        List<HistoricIdentityLink> identityLinks = historyService.getHistoricIdentityLinksForProcessInstance("7505");
         for (HistoricIdentityLink identityLink : identityLinks){
             System.out.println("通过实例查询审批人: " + identityLink.getGroupId() + ", " + identityLink.getUserId() + ", " +identityLink.getType());
         }
 
         // 通过任务查询历史参与人/组
-        List<HistoricIdentityLink> linksForTask = historyService.getHistoricIdentityLinksForTask("82506");
+        List<HistoricIdentityLink> linksForTask = historyService.getHistoricIdentityLinksForTask("7509");
         for (HistoricIdentityLink identityLink : linksForTask){
             System.out.println("通过任务查询候选组: " + identityLink.getGroupId() + ", " + identityLink.getUserId() + ", " +identityLink.getType());
         }

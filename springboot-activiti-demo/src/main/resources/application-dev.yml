@@ -11,8 +11,8 @@ spring:
 #    关闭activiti自动部署 --> 使用流程部署器部署,不使用具体访问文件方式
     check-process-definitions: false
 
-#logging:
-#  level:
-#   org.activiti.engine.impl.persistence.entity: debug
-#  pattern:
-#   console: '%d{yyyy/MM/dd-HH:mm:ss} [%thread] %-5level %logger- %msg%n'
+logging:
+  level:
+   org.activiti.engine.impl.persistence.entity: debug
+  pattern:
+   console: '%d{yyyy/MM/dd-HH:mm:ss} [%thread] %-5level %logger- %msg%n'
